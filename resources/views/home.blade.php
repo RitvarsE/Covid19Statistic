@@ -24,9 +24,7 @@
                value="Submit">
         @csrf
     </form>
-    @if($data === 'home')
-    @elseif($data === null)
-        <div class="text-gray-700 text-l font-bold">Invalid region</div>
+    @if($data === null)
     @else
         Region :
         <div class="display: inline text-gray-700 text-l font-bold">{{$data->region_name}}</div> <br>

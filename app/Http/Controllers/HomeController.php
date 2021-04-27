@@ -21,7 +21,7 @@ class HomeController extends Controller
 
     public function home(): View
     {
-        $data = 'home';
+        $data = null;
         $regions = $this->statisticService->regions()->all();
         return View('home', ['data' => $data, 'regions' => $regions]);
     }
