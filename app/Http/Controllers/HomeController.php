@@ -22,14 +22,17 @@ class HomeController extends Controller
     public function home(): View
     {
         $data = 'home';
-        return View('home',['data' => $data]);
+        $regions = $this->statisticService->regions()->all();
+        return View('home', ['data' => $data, 'regions' => $regions]);
     }
 
     public function searchData(Request $request): View
     {
         $data = $this->statisticService->search($request);
-        return View('home', ['data' => $data]);
+        $regions = $this->statisticService->regions();
+        return View('home', ['data' => $data, 'regions' => $regions]);
     }
+
     public function update(): View
     {
         $this->statisticService->update();

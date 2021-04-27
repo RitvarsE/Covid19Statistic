@@ -5,6 +5,7 @@ namespace App\Services;
 
 
 use App\Models\Regions;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class StatisticService
@@ -13,6 +14,11 @@ class StatisticService
     {
         $region = $request->get('region');
         return Regions::where('region_name', $region)->orderBy('data_id', 'desc')->first();
+    }
+
+    public function regions(): Collection
+    {
+        return Regions::all()->unique('region_name');
     }
 
     //to update statistic use artisan console command: statistic:update
@@ -32,9 +38,6 @@ class StatisticService
             $offset += 100;
             echo $offset;
             foreach ($allData['records'] as $data) {
-                if ($data['ATVK'] === 'Nav') {
-                    $data['ATVK'] = 0;
-                }
                 if ($data['AktivaCOVID19infekcija'] === '…' || $data['AktivaCOVID19infekcija'] === '...') {
                     $data['AktivaCOVID19infekcija'] = 0;
                 }
@@ -53,15 +56,17 @@ class StatisticService
                 if ($data['ApstiprinataCOVID19infekcija'] === 'no 1 līdz 5') {
                     $data['ApstiprinataCOVID19infekcija'] = 3;
                 }
-                Regions::updateOrCreate(
-                    ['data_id' => $data["_id"]],
-                    ['region_name' => $data["AdministrativiTeritorialasVienibasNosaukums"],
-                        'ATVK' => $data['ATVK'],
-                        'confirmed_infection' => $data["ApstiprinataCOVID19infekcija"],
-                        'active_infection' => $data["AktivaCOVID19infekcija"],
-                        '14_day_cumulative' => $data["14DienuKumulativaSaslimstiba"],
-                        'registration_date' => $data["Datums"]]
-                );
+                if ($data['ATVK'] !== 'Nav') {
+                    Regions::updateOrCreate(
+                        ['data_id' => $data["_id"]],
+                        ['region_name' => $data["AdministrativiTeritorialasVienibasNosaukums"],
+                            'ATVK' => $data['ATVK'],
+                            'confirmed_infection' => $data["ApstiprinataCOVID19infekcija"],
+                            'active_infection' => $data["AktivaCOVID19infekcija"],
+                            '14_day_cumulative' => $data["14DienuKumulativaSaslimstiba"],
+                            'registration_date' => $data["Datums"]]
+                    );
+                }
 
             }
         }
